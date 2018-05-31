@@ -4,26 +4,26 @@
 
 package org.keycloak.waffle.authenticator;
 
-import java.io.IOException;
-import java.util.Base64;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
+import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
+import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.ModelDuplicateException;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserModel;
+import org.keycloak.events.Errors;
+import org.keycloak.models.*;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.services.ServicesLogger;
-
+import org.keycloak.waffle.NTLMCredentialInput;
 import waffle.util.AuthorizationHeader;
 import waffle.windows.auth.IWindowsAuthProvider;
 import waffle.windows.auth.IWindowsIdentity;
 import waffle.windows.auth.IWindowsSecurityContext;
 import waffle.windows.auth.impl.WindowsAuthProviderImpl;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.Map;
 
 /**
  * main implementation class, reworked for nginx compatibility
@@ -31,6 +31,8 @@ import waffle.windows.auth.impl.WindowsAuthProviderImpl;
  *
  */
 public class KeycloakWaffleAuthenticator implements Authenticator {
+
+    private static final Logger logger = Logger.getLogger(KeycloakWaffleAuthenticator.class);
 
     private static final String CONNECTION_SEPARATOR = ":";
 	private static final String KEEP_ALIVE = "keep-alive";
@@ -60,10 +62,10 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 		String auth = getRequestHeader(context, AUTHORIZATION); 			
 		if (auth == null) {
 			Response response = Response.noContent().status(Response.Status.UNAUTHORIZED).header(WWW_AUTHENTICATE, NTLM).build();
-        	context.challenge(response);
+        	context.forceChallenge(response);
 	        return null;
 		}
-		System.out.println("auth is " + auth);
+        logger.info("auth is " + auth);
 		if (auth.startsWith(NTLM2)) {
 			//waffle part
 			final AuthorizationHeader authorizationHeader = new CustomAuthorizationHeader(context);
@@ -73,12 +75,12 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 			if(xForwarded != null && xPort != null) {
 				connectionId = getConnectionId(xForwarded, xPort);
 			} else {
-				System.out.println("headers...");
-				System.out.println(context.getConnection().getRemoteAddr());
-				System.out.println(context.getConnection().getRemotePort());
+                logger.info("headers...");
+                logger.info(context.getConnection().getRemoteAddr());
+                logger.info(context.getConnection().getRemotePort());
 				context.getHttpRequest().getHttpHeaders().getRequestHeaders().forEach((a, b) -> {
-					System.out.println(a);
-					System.out.println(b);
+                    logger.info(a);
+                    logger.info(b);
 				});
 				connectionId = String.join(CONNECTION_SEPARATOR, context.getConnection().getRemoteAddr(), String.valueOf(context.getConnection().getRemotePort()));
 			}
@@ -86,7 +88,7 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 	        final String securityPackage = authorizationHeader.getSecurityPackage();			
 			System.out.printf("security package: %s, connection id: %s\n", securityPackage, connectionId);
 	        if (ntlmPost) {
-	        	System.out.println("was ntlmPost");
+                logger.info("was ntlmPost");
 	            // type 2 NTLM authentication message received
 	            this.auth.resetSecurityToken(connectionId);
 	        }
@@ -97,7 +99,7 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 	        	 securityContext = this.auth.acceptSecurityToken(connectionId, tokenBuffer, securityPackage);
 	        } catch (Exception e) {
 				Response response = Response.noContent().status(Response.Status.UNAUTHORIZED).build();
-	        	context.challenge(response);	        	
+	        	context.forceChallenge(response);
 	        	//this can be context.cancelLogin();
 	        	context.attempted();
 		        return null;
@@ -109,12 +111,12 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 	            final String continueToken = Base64.getEncoder().encodeToString(continueTokenBytes);
 	            responseBuilder.header(WWW_AUTHENTICATE2, securityPackage + " " + continueToken);
 	        }
-	        System.out.println("continue required: " + Boolean.valueOf(securityContext.isContinue()));
+            logger.info("continue required: " + Boolean.valueOf(securityContext.isContinue()));
 	        
 	        if (securityContext.isContinue() || ntlmPost) {
 	        	responseBuilder.header(CONNECTION, KEEP_ALIVE);
 	        	responseBuilder.status(Response.Status.UNAUTHORIZED).build();
-	        	context.challenge(responseBuilder.build());
+	        	context.forceChallenge(responseBuilder.build());
 	            return null;
 	        }
 	        final IWindowsIdentity identity = securityContext.getIdentity();
@@ -142,14 +144,6 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 		}
 		return String.join(CONNECTION_SEPARATOR, host, port);
 	}
-	
-	private String extractUserWithoutDomain(String username) {
-		if(username.contains("\\")) {
-			username = username.substring(username.indexOf("\\") + 1, username.length());
-		}
-		return username;
-	}
-
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
@@ -158,14 +152,42 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 		try {
 			identity = getNTLMIdentity(context);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.warn("Cannot authenticate ntlm identity", e);
 			return;
 		}
 		if(identity == null) 
 			return;
-        System.out.println("identity is " + identity.getFqn());
-		//the fqn has the form domain\\user
+        logger.info("identity is " + identity.getFqn());
+
+        if (tryToLoginByUsername(context, identity)) return;
+
+        NTLMCredentialInput ntlmCredentialInput = new NTLMCredentialInput(identity);
+        CredentialValidationOutput output =
+                context.getSession().userCredentialManager().authenticate(context.getSession(), context.getRealm(), ntlmCredentialInput);
+
+        if (output == null) {
+            logger.warn("Received ntlm token, but there is no user storage provider that handles ntlm credentials.");
+            context.attempted();
+            return;
+        }
+
+        if (output.getAuthStatus() == CredentialValidationOutput.Status.AUTHENTICATED) {
+            context.setUser(output.getAuthenticatedUser());
+            if (output.getState() != null && !output.getState().isEmpty()) {
+                for (Map.Entry<String, String> entry : output.getState().entrySet()) {
+                    context.getAuthenticationSession().setUserSessionNote(entry.getKey(), entry.getValue());
+                }
+            }
+            context.success();
+            logger.info("KeycloakWaffleAuthenticator :: authenticate :: success");
+        } else {
+            context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
+            context.failure(AuthenticationFlowError.INVALID_CREDENTIALS);
+        }
+    }
+
+    private boolean tryToLoginByUsername(AuthenticationFlowContext context, IWindowsIdentity identity) {
+        //the fqn has the form domain\\user
         String username = extractUserWithoutDomain(identity.getFqn());
         UserModel user = null;
         try {
@@ -173,34 +195,44 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
         } catch (ModelDuplicateException mde) {
             ServicesLogger.LOGGER.modelDuplicateException(mde);
             // Could happen during federation import
-            return;
+            return true;
         }
-        context.setUser(user);
-        context.success();
-        System.out.println("KeycloakWaffleAuthenticator :: authenticate :: success");   
+        if(user != null){
+            context.setUser(user);
+            context.success();
+            return true;
+        }
+        return false;
+    }
+
+    private String extractUserWithoutDomain(String username) {
+        if (username.contains("\\")) {
+            username = username.substring(username.indexOf("\\") + 1, username.length());
+        }
+        return username;
     }
 
     @Override
     public boolean requiresUser() {
-    	System.out.println("KeycloakWaffleAuthenticator :: requiresUser");
+    	logger.info("KeycloakWaffleAuthenticator :: requiresUser");
         //return true;
     	return false;
     }
 
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
-    	System.out.println("KeycloakWaffleAuthenticator :: configuredFor");
+        logger.info("KeycloakWaffleAuthenticator :: configuredFor");
         return false;
     }
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-    	System.out.println("KeycloakWaffleAuthenticator :: setRequiredActions");
+        logger.info("KeycloakWaffleAuthenticator :: setRequiredActions");
     }
 
     @Override
     public void close() {
-    	System.out.println("KeycloakWaffleAuthenticator :: close");
+        logger.info("KeycloakWaffleAuthenticator :: close");
 
     }
 
