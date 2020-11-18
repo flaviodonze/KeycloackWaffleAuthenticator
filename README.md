@@ -7,7 +7,7 @@ Author: bogdan <bogdan.tudor@nn.ro> and flavio.donze <flavio.donze@scodi.ch>
 
 Tested with keycloak-11.0.3
 
-## Keycloak behind http://nginx.org/ - reverse proxy
+## Keycloak behind [nginx](http://nginx.org/) - reverse proxy
 
 It is important to use a upstream configuration with keepalive as proxy_pass, also the here declared proxy parameters are required otherwise will run into an excpetion:
 > com.sun.jna.platform.win32.Win32Exception: The token supplied to the function is invalid
@@ -18,9 +18,7 @@ It is important to use a upstream configuration with keepalive as proxy_pass, al
 	}
 
 	server {
-		
 		...
-		
 		location /auth/ {
 			# required for SSO through NTLM
 			proxy_set_header Connection "";
