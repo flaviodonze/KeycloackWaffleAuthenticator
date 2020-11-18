@@ -10,4 +10,4 @@ Uses SPI as per Keycloak documentation. The waffle usage is little altered, beca
 Author: bogdan <bogdan.tudor@nn.ro>
 Author: flavio.donze <flavio.donze@scodi.ch>
 
-Tested with keycloak-11.0.3- keycloak
+Tested with keycloak-11.0.3
