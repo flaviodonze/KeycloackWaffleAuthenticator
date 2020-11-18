@@ -1,4 +1,4 @@
-# KeycloackWaffleAuthenticator
+# keycloak-waffle-authenticator
 
 Keycloack authenticator module using waffle.<br/>
 Uses SPI as per Keycloak documentation. The waffle usage is little altered, because of http request usage.
