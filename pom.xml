@@ -10,8 +10,8 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<keycloack.version>11.0.3</keycloack.version>
-    	<jboss.logging.version>3.4.1.Final</jboss.logging.version>
-    	<outputDirectory>D:\dev\software\keycloak\standalone\deployments</outputDirectory>
+		<jboss.logging.version>3.4.1.Final</jboss.logging.version>
+		<outputDirectory>D:\dev\software\keycloak\standalone\deployments</outputDirectory>
 	</properties>
 
 
@@ -50,7 +50,7 @@
 			<groupId>org.jboss.logging</groupId>
 			<artifactId>jboss-logging</artifactId>
 			<scope>provided</scope>
-            <version>${jboss.logging.version}</version>
+			<version>${jboss.logging.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.keycloak</groupId>
