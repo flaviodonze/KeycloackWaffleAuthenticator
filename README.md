@@ -8,5 +8,6 @@ Keycloack authenticator module using waffle.
 Uses SPI as per Keycloak documentation. The waffle usage is little altered, because of http request usage.
 
 Author: bogdan <bogdan.tudor@nn.ro>
+Author: flavio.donze <flavio.donze@scodi.ch>
 
-Tested with keycloak-3.4.3.Final - keycloak / Wildfly 10.1.0 - vanilla client
+Tested with keycloak-11.0.3- keycloak
