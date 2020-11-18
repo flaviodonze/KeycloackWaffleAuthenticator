@@ -1,15 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>KeycloackWaffleAuthenticator</groupId>
-  <artifactId>KeycloackWaffleAuthenticator</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-    
-    <properties>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>KeycloackWaffleAuthenticator</groupId>
+	<artifactId>KeycloackWaffleAuthenticator</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<properties>
+		<java.version>11</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<keycloack.version>11.0.3</keycloack.version>
     	<jboss.logging.version>3.4.1.Final</jboss.logging.version>
-    </properties>
-  
-  
+	</properties>
+
+
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.github.waffle/waffle-jna -->
 		<dependency>
@@ -24,50 +28,62 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-core</artifactId>
-            <version>${keycloack.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-server-spi</artifactId>
-            <scope>provided</scope>
-            <version>${keycloack.version}</version>            
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-server-spi-private</artifactId>
-            <scope>provided</scope>
-            <version>${keycloack.version}</version>            
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-            <scope>provided</scope>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-core</artifactId>
+			<version>${keycloack.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-server-spi</artifactId>
+			<scope>provided</scope>
+			<version>${keycloack.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-server-spi-private</artifactId>
+			<scope>provided</scope>
+			<version>${keycloack.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.logging</groupId>
+			<artifactId>jboss-logging</artifactId>
+			<scope>provided</scope>
             <version>${jboss.logging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-services</artifactId>
-            <scope>provided</scope>
-            <version>${keycloack.version}</version>            
-        </dependency>
-    </dependencies>
-  
-    <build>
-        <finalName>KeycloakWaffleAuthenticator</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-  
-  
+		</dependency>
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-services</artifactId>
+			<scope>provided</scope>
+			<version>${keycloack.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.3.0</version>
+
+				<configuration>
+					<finalName>waffle-authenticator</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
