@@ -21,7 +21,6 @@ import waffle.windows.auth.impl.WindowsAuthProviderImpl;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import java.io.IOException;
 import java.util.Base64;
 import java.util.Map;
 
@@ -55,7 +54,7 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 	 * the X-Forwarded-Port header is set up to remote port, for nginx use:
 	 * proxy_set_header X-Forwarded-Port     $remote_port;
 	 */
-	private IWindowsIdentity getNTLMIdentity(AuthenticationFlowContext context) throws IOException {
+	private IWindowsIdentity getNTLMIdentity(AuthenticationFlowContext context) {
 		//added by proxies
 		String xForwarded = getRequestHeader(context, X_FORWARDED_FOR); //comma separated
 		String xPort = getRequestHeader(context, X_FORWARDED_PORT); 	//if it contains : must split	
@@ -151,7 +150,7 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
         IWindowsIdentity identity = null;
 		try {
 			identity = getNTLMIdentity(context);
-		} catch (IOException e) {
+		} catch (Exception e) {
             logger.warn("Cannot authenticate ntlm identity", e);
 			return;
 		}

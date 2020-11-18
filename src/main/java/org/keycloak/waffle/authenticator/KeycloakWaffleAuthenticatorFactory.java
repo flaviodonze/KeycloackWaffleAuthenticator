@@ -20,7 +20,6 @@ package org.keycloak.waffle.authenticator;
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
-import org.keycloak.authentication.ConfigurableAuthenticatorFactory;
 import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
@@ -34,7 +33,7 @@ import java.util.List;
  * @author bogdan
  *
  */
-public class KeycloakWaffleAuthenticatorFactory implements AuthenticatorFactory, ConfigurableAuthenticatorFactory {
+public class KeycloakWaffleAuthenticatorFactory implements AuthenticatorFactory {
 
     public static final String PROVIDER_ID = "keycloak-waffle-authenticator";
     private static final KeycloakWaffleAuthenticator SINGLETON = new KeycloakWaffleAuthenticator();
