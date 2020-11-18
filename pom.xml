@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>KeycloackWaffleAuthenticator</groupId>
-	<artifactId>KeycloackWaffleAuthenticator</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>ch.scodi.keycloak</groupId>
+	<artifactId>waffle-authenticator</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
 
 	<properties>
 		<java.version>11</java.version>
@@ -11,6 +11,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<keycloack.version>11.0.3</keycloack.version>
     	<jboss.logging.version>3.4.1.Final</jboss.logging.version>
+    	<outputDirectory>D:\dev\software\keycloak\standalone\deployments</outputDirectory>
 	</properties>
 
 
@@ -67,11 +68,10 @@
 				<version>3.3.0</version>
 
 				<configuration>
-					<finalName>waffle-authenticator</finalName>
-					<appendAssemblyId>false</appendAssemblyId>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					<outputDirectory>${outputDirectory}</outputDirectory>
 				</configuration>
 				<executions>
 					<execution>
