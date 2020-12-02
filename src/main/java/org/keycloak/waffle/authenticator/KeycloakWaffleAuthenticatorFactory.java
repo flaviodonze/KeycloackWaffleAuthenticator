@@ -17,6 +17,9 @@
 
 package org.keycloak.waffle.authenticator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
@@ -25,88 +28,79 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * 
  * @author bogdan
- *
  */
 public class KeycloakWaffleAuthenticatorFactory implements AuthenticatorFactory {
 
-    public static final String PROVIDER_ID = "keycloak-waffle-authenticator";
-    private static final KeycloakWaffleAuthenticator SINGLETON = new KeycloakWaffleAuthenticator();
+	public static final String PROVIDER_ID = "keycloak-waffle-authenticator";
+	private static final KeycloakWaffleAuthenticator SINGLETON = new KeycloakWaffleAuthenticator();
 
-    @Override
-    public String getId() {
-        return PROVIDER_ID;
-    }
+	@Override
+	public String getId() {
+		return PROVIDER_ID;
+	}
 
-    @Override
-    public Authenticator create(KeycloakSession session) {
-        return SINGLETON;
-    }
+	@Override
+	public Authenticator create(KeycloakSession session) {
+		return SINGLETON;
+	}
 
-    private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
-            AuthenticationExecutionModel.Requirement.REQUIRED,
-            AuthenticationExecutionModel.Requirement.ALTERNATIVE,
-            AuthenticationExecutionModel.Requirement.DISABLED
-    };
-    @Override
-    public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
-        return REQUIREMENT_CHOICES;
-    }
+	private static AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = { AuthenticationExecutionModel.Requirement.REQUIRED,
+			AuthenticationExecutionModel.Requirement.ALTERNATIVE, AuthenticationExecutionModel.Requirement.DISABLED };
 
-    @Override
-    public boolean isUserSetupAllowed() {
-    	System.out.println("KeycloakWaffleAuthenticatorFactory :: isUserSetupAllowed");
-        return true;
-    }
+	@Override
+	public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
+		return REQUIREMENT_CHOICES;
+	}
 
-    @Override
-    public boolean isConfigurable() {
-    	System.out.println("KeycloakWaffleAuthenticatorFactory :: isConfigurable");
-        return true;
-    }
+	@Override
+	public boolean isUserSetupAllowed() {
+		System.out.println("KeycloakWaffleAuthenticatorFactory :: isUserSetupAllowed");
+		return true;
+	}
 
-    @Override
-    public List<ProviderConfigProperty> getConfigProperties() {
-        return configProperties;
-    }
+	@Override
+	public boolean isConfigurable() {
+		System.out.println("KeycloakWaffleAuthenticatorFactory :: isConfigurable");
+		return true;
+	}
 
-    private static final List<ProviderConfigProperty> configProperties = new ArrayList<ProviderConfigProperty>();
+	@Override
+	public List<ProviderConfigProperty> getConfigProperties() {
+		return configProperties;
+	}
 
-    @Override
-    public String getHelpText() {
-    	System.out.println("KeycloakWaffleAuthenticatorFactory :: getHelpText");
-        return "Keycloak Waffle Authenticator";
-    }
+	private static final List<ProviderConfigProperty> configProperties = new ArrayList<ProviderConfigProperty>();
 
-    @Override
-    public String getDisplayType() {
-        return "Keycloak Waffle Authenticator";
-    }
+	@Override
+	public String getHelpText() {
+		return "Keycloak Waffle Authenticator";
+	}
 
-    @Override
-    public String getReferenceCategory() {
-        return "KeycloakWaffleAuthenticatorFactory :: getReferenceCategory";
-    }
+	@Override
+	public String getDisplayType() {
+		return "Keycloak Waffle Authenticator";
+	}
 
-    @Override
-    public void init(Config.Scope config) {
-    	System.out.println("KeycloakWaffleAuthenticatorFactory :: init");
-    }
+	@Override
+	public String getReferenceCategory() {
+		return "KeycloakWaffleAuthenticatorFactory :: getReferenceCategory";
+	}
 
-    @Override
-    public void postInit(KeycloakSessionFactory factory) {
+	@Override
+	public void init(Config.Scope config) {
+		System.out.println("KeycloakWaffleAuthenticatorFactory :: init");
+	}
 
-    }
+	@Override
+	public void postInit(KeycloakSessionFactory factory) {
 
-    @Override
-    public void close() {
+	}
 
-    }
+	@Override
+	public void close() {
 
+	}
 
 }
