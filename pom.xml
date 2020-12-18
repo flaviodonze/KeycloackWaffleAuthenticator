@@ -5,13 +5,13 @@
 	<version>1.0.0-SNAPSHOT</version>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>14</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<keycloack.version>11.0.3</keycloack.version>
+		<keycloack.version>12.0.0</keycloack.version>
 		<jboss.logging.version>3.4.1.Final</jboss.logging.version>
-		<outputDirectory>D:\dev\software\keycloak\standalone\deployments</outputDirectory>
+		<outputDirectory>D:\dev\software\scodidev-server\keycloak\standalone\deployments</outputDirectory>
 	</properties>
 
 
