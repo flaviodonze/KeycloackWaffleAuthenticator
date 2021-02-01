@@ -4,25 +4,32 @@
 
 package org.keycloak.waffle.authenticator;
 
+import java.util.Base64;
+import java.util.Map;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.events.Errors;
-import org.keycloak.models.*;
+import org.keycloak.models.CredentialValidationOutput;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.ModelDuplicateException;
+import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.services.ServicesLogger;
+import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.waffle.NTLMCredentialInput;
+
 import waffle.util.AuthorizationHeader;
 import waffle.windows.auth.IWindowsAuthProvider;
 import waffle.windows.auth.IWindowsIdentity;
 import waffle.windows.auth.IWindowsSecurityContext;
 import waffle.windows.auth.impl.WindowsAuthProviderImpl;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import java.util.Base64;
-import java.util.Map;
 
 /**
  * main implementation class, reworked for nginx compatibility
@@ -146,7 +153,15 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
-        
+		AuthenticationSessionModel session = context.getAuthenticationSession();
+		Map<String, String> clientNotes = session.getClientNotes();
+
+		if ("login".equals(clientNotes.get("prompt"))) {
+			logger.info("skip waffle authenticator because of client requests login prompt: " + clientNotes); //$NON-NLS-1$
+			context.attempted();
+			return;
+		}
+    	
         IWindowsIdentity identity = null;
 		try {
 			identity = getNTLMIdentity(context);
