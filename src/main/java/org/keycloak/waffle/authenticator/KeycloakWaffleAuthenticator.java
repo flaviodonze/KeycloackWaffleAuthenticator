@@ -81,20 +81,20 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 			if(xForwarded != null && xPort != null) {
 				connectionId = getConnectionId(xForwarded, xPort);
 			} else {
-                logger.info("headers...");
-                logger.info(context.getConnection().getRemoteAddr());
-                logger.info(context.getConnection().getRemotePort());
+                logger.debug("headers...");
+                logger.debug(context.getConnection().getRemoteAddr());
+                logger.debug(context.getConnection().getRemotePort());
 				context.getHttpRequest().getHttpHeaders().getRequestHeaders().forEach((a, b) -> {
-                    logger.info(a);
-                    logger.info(b);
+                    logger.debug(a);
+                    logger.debug(b);
 				});
 				connectionId = String.join(CONNECTION_SEPARATOR, context.getConnection().getRemoteAddr(), String.valueOf(context.getConnection().getRemotePort()));
 			}
 	        
 	        final String securityPackage = authorizationHeader.getSecurityPackage();			
-			System.out.printf("security package: %s, connection id: %s\n", securityPackage, connectionId);
+	        logger.debugv("security package: {0}, connection id: {1}\n", securityPackage, connectionId);
 	        if (ntlmPost) {
-                logger.info("was ntlmPost");
+                logger.debug("was ntlmPost");
 	            // type 2 NTLM authentication message received
 	            this.auth.resetSecurityToken(connectionId);
 	        }
@@ -117,7 +117,7 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 	            final String continueToken = Base64.getEncoder().encodeToString(continueTokenBytes);
 	            responseBuilder.header(WWW_AUTHENTICATE2, securityPackage + " " + continueToken);
 	        }
-            logger.info("continue required: " + Boolean.valueOf(securityContext.isContinue()));
+            logger.debugv("continue required: {0}", Boolean.valueOf(securityContext.isContinue()));
 	        
 	        if (securityContext.isContinue() || ntlmPost) {
 	        	responseBuilder.header(CONNECTION, KEEP_ALIVE);
@@ -171,7 +171,7 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 		}
 		if(identity == null) 
 			return;
-        logger.info("identity is " + identity.getFqn());
+        logger.infov("identity is {0}", identity.getFqn());
 
         if (tryToLoginByUsername(context, identity)) return;
 
@@ -193,7 +193,7 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
                 }
             }
             context.success();
-            logger.info("KeycloakWaffleAuthenticator :: authenticate :: success");
+            logger.info("authenticate :: success");
         } else {
             context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
             context.failure(AuthenticationFlowError.INVALID_CREDENTIALS);
@@ -228,31 +228,30 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 
     @Override
     public boolean requiresUser() {
-    	logger.info("KeycloakWaffleAuthenticator :: requiresUser");
+    	logger.debugv("requiresUser");
         //return true;
     	return false;
     }
 
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
-        logger.info("KeycloakWaffleAuthenticator :: configuredFor");
+        logger.debugv("configuredFor {0}", user);
         return false;
     }
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-        logger.info("KeycloakWaffleAuthenticator :: setRequiredActions");
+        logger.debugv("setRequiredActions {0}", user);
     }
 
     @Override
     public void close() {
-        logger.info("KeycloakWaffleAuthenticator :: close");
+        logger.debugv("close");
 
     }
 
 	@Override
 	public void action(AuthenticationFlowContext context) {
-		// TODO Auto-generated method stub
-		
+		logger.debugv("action {0}", context);
 	}
 }
