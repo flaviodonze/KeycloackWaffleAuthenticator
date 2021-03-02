@@ -63,7 +63,7 @@ public class KeycloakWaffleAuthenticatorFactory implements AuthenticatorFactory 
 	@Override
 	public boolean isConfigurable() {
 		System.out.println("KeycloakWaffleAuthenticatorFactory :: isConfigurable");
-		return true;
+		return false;
 	}
 
 	@Override
