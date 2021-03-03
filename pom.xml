@@ -9,7 +9,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<keycloack.version>12.0.2</keycloack.version>
+		<keycloack.version>12.0.4</keycloack.version>
 		<jboss.logging.version>3.4.1.Final</jboss.logging.version>
 		<outputDirectory>D:\dev\env\scodidev\server\keycloak\standalone\deployments</outputDirectory>
 	</properties>

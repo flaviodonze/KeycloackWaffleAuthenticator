@@ -5,7 +5,7 @@ Uses SPI as per Keycloak documentation. The waffle usage is little altered, beca
 
 Author: bogdan <bogdan.tudor@nn.ro> and flavio.donze <flavio.donze@scodi.ch>
 
-Tested with keycloak-11.0.3
+Tested with keycloak-12.0.4
 
 ## Keycloak behind [nginx](http://nginx.org/) - reverse proxy
 
