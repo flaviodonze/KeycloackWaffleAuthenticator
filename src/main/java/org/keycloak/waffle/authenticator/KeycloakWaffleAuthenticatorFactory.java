@@ -33,7 +33,7 @@ import org.keycloak.provider.ProviderConfigProperty;
  */
 public class KeycloakWaffleAuthenticatorFactory implements AuthenticatorFactory {
 
-	public static final String PROVIDER_ID = "keycloak-waffle-authenticator";
+	public static final String PROVIDER_ID = "waffle-authenticator";
 	private static final KeycloakWaffleAuthenticator SINGLETON = new KeycloakWaffleAuthenticator();
 
 	@Override
@@ -56,13 +56,11 @@ public class KeycloakWaffleAuthenticatorFactory implements AuthenticatorFactory 
 
 	@Override
 	public boolean isUserSetupAllowed() {
-		System.out.println("KeycloakWaffleAuthenticatorFactory :: isUserSetupAllowed");
 		return true;
 	}
 
 	@Override
 	public boolean isConfigurable() {
-		System.out.println("KeycloakWaffleAuthenticatorFactory :: isConfigurable");
 		return false;
 	}
 
@@ -75,12 +73,12 @@ public class KeycloakWaffleAuthenticatorFactory implements AuthenticatorFactory 
 
 	@Override
 	public String getHelpText() {
-		return "Keycloak Waffle Authenticator";
+		return "Waffle Authenticator";
 	}
 
 	@Override
 	public String getDisplayType() {
-		return "Keycloak Waffle Authenticator";
+		return "Waffle Authenticator";
 	}
 
 	@Override
@@ -90,7 +88,7 @@ public class KeycloakWaffleAuthenticatorFactory implements AuthenticatorFactory 
 
 	@Override
 	public void init(Config.Scope config) {
-		System.out.println("KeycloakWaffleAuthenticatorFactory :: init");
+
 	}
 
 	@Override
