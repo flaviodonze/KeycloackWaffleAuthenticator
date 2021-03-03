@@ -67,6 +67,9 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 		String xPort = getRequestHeader(context, X_FORWARDED_PORT); 	//if it contains : must split	
 		String auth = getRequestHeader(context, AUTHORIZATION); 			
 		if (auth == null) {
+			// first entry will always end here, in SSO environment or not
+			logger.info("auth was null, forceChallenge");
+
 			Response response = Response.noContent().status(Response.Status.UNAUTHORIZED).header(WWW_AUTHENTICATE, NTLM).build();
         	context.forceChallenge(response);
 	        return null;
@@ -153,6 +156,8 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
+		logger.info("waffle authenticate"); //$NON-NLS-1$
+
 		AuthenticationSessionModel session = context.getAuthenticationSession();
 		Map<String, String> clientNotes = session.getClientNotes();
 
@@ -169,11 +174,22 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
             logger.warn("Cannot authenticate ntlm identity", e);
 			return;
 		}
-		if(identity == null) 
+		if (identity == null) {
+			logger.info("identity is null");
 			return;
-        logger.infov("identity is {0}", identity.getFqn());
+		}
+		String fqn = identity.getFqn();
+		logger.infov("identity is {0}", fqn);
 
-        if (tryToLoginByUsername(context, identity)) return;
+		if (fqn != null && (fqn.contains("ANONYMOUS") || fqn.contains("anonymous"))) {
+			logger.infov("authentication done, identity was anonymous, mark as 'attempted': {}", fqn);
+			context.attempted();
+			return;
+		}
+
+		if (tryToLoginByUsername(context, identity)) {
+			return;
+		}
 
         NTLMCredentialInput ntlmCredentialInput = new NTLMCredentialInput(identity);
         CredentialValidationOutput output =
