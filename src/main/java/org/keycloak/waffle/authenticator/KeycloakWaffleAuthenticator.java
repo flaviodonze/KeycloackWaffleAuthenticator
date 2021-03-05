@@ -12,10 +12,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
-import org.keycloak.events.Errors;
-import org.keycloak.models.CredentialValidationOutput;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
@@ -23,7 +20,6 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.sessions.AuthenticationSessionModel;
-import org.keycloak.waffle.NTLMCredentialInput;
 
 import waffle.util.AuthorizationHeader;
 import waffle.windows.auth.IWindowsAuthProvider;
@@ -191,30 +187,31 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 			return;
 		}
 
-        NTLMCredentialInput ntlmCredentialInput = new NTLMCredentialInput(identity);
-        CredentialValidationOutput output =
-                context.getSession().userCredentialManager().authenticate(context.getSession(), context.getRealm(), ntlmCredentialInput);
-
-        if (output == null) {
-            logger.warn("Received ntlm token, but there is no user storage provider that handles ntlm credentials.");
-            context.attempted();
-            return;
-        }
-
-        if (output.getAuthStatus() == CredentialValidationOutput.Status.AUTHENTICATED) {
-            context.setUser(output.getAuthenticatedUser());
-            if (output.getState() != null && !output.getState().isEmpty()) {
-                for (Map.Entry<String, String> entry : output.getState().entrySet()) {
-                    context.getAuthenticationSession().setUserSessionNote(entry.getKey(), entry.getValue());
-                }
-            }
-            context.success();
-            logger.info("authenticate :: success");
-        } else {
-            context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
-            context.failure(AuthenticationFlowError.INVALID_CREDENTIALS);
-        }
-    }
+		//        NTLMCredentialInput ntlmCredentialInput = new NTLMCredentialInput(identity);
+		//        CredentialValidationOutput output =
+		//                context.getSession().userCredentialManager().authenticate(context.getSession(), context.getRealm(), ntlmCredentialInput);
+		//
+		//        if (output == null) {
+		//		logger.warn("Received ntlm token, but there is no user storage provider that handles ntlm credentials.");
+		logger.infov("NTLM login failed for {}, fallback to other configured authenticators.", fqn);
+		context.attempted();
+		return;
+		//        }
+		//
+		//        if (output.getAuthStatus() == CredentialValidationOutput.Status.AUTHENTICATED) {
+		//            context.setUser(output.getAuthenticatedUser());
+		//            if (output.getState() != null && !output.getState().isEmpty()) {
+		//                for (Map.Entry<String, String> entry : output.getState().entrySet()) {
+		//                    context.getAuthenticationSession().setUserSessionNote(entry.getKey(), entry.getValue());
+		//                }
+		//            }
+		//            context.success();
+		//            logger.info("authenticate :: success");
+		//        } else {
+		//            context.getEvent().error(Errors.INVALID_USER_CREDENTIALS);
+		//            context.failure(AuthenticationFlowError.INVALID_CREDENTIALS);
+		//        }
+	}
 
     private boolean tryToLoginByUsername(AuthenticationFlowContext context, IWindowsIdentity identity) {
         //the fqn has the form domain\\user
