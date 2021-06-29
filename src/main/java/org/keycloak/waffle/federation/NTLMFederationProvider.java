@@ -64,9 +64,9 @@ public class NTLMFederationProvider implements UserStorageProvider, CredentialAu
 	}
 
 	private UserModel findOrCreateAuthenticatedUser(RealmModel realm, String username, IWindowsAccount[] groups, String sidString) {
-		UserModel user = session.userLocalStorage().getUserByUsername(username, realm);
+		UserModel user = session.userLocalStorage().getUserByUsername(realm, username);
 		if (user != null) {
-			user = session.users().getUserById(user.getId(), realm); // make sure we get a cached instance
+			user = session.users().getUserById(realm, user.getId()); // make sure we get a cached instance
 			logger.debug("NTLM authenticated user " + username + " found in Keycloak storage");
 
 			if (!userStorageProviderModel.getId().equals(user.getFederationLink())) {
