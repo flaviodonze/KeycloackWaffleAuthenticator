@@ -26,7 +26,8 @@ public class CustomAuthorizationHeader extends AuthorizationHeader {
 		super(null);
 		this.context = context;
 	}
-	
+
+	@Override
 	public boolean isNtlmType1PostAuthorizationHeader() {
 		String method = this.context.getHttpRequest().getHttpMethod();
 		//here, the length is not obvious
