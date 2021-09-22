@@ -57,6 +57,7 @@ public class KeycloakWaffleAuthenticator implements Authenticator {
 	 * the X-Forwarded-Port header is set up to remote port, for nginx use:
 	 * proxy_set_header X-Forwarded-Port     $remote_port;
 	 */
+	@SuppressWarnings("resource")
 	private IWindowsIdentity getNTLMIdentity(AuthenticationFlowContext context) {
 		//added by proxies
 		String xForwarded = getRequestHeader(context, X_FORWARDED_FOR); //comma separated
