@@ -69,7 +69,7 @@ public class KeycloakWaffleAuthenticatorFactory implements AuthenticatorFactory 
 		return configProperties;
 	}
 
-	private static final List<ProviderConfigProperty> configProperties = new ArrayList<ProviderConfigProperty>();
+	private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
 	@Override
 	public String getHelpText() {

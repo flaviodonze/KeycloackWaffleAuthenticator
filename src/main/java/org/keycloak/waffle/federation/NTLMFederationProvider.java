@@ -49,7 +49,7 @@ public class NTLMFederationProvider implements UserStorageProvider, CredentialAu
 		if (credential.getType().equals(NTLMCredentialInput.NTLM_CREDENTIAL_TYPE)) {
 			IWindowsIdentity windowsIdentity = credential.getWindowsIdentity();
 
-			Map<String, String> state = new HashMap<String, String>();
+			Map<String, String> state = new HashMap<>();
 			if (!windowsIdentity.isGuest()) {
 				String username = extractUserWithoutDomain(windowsIdentity.getFqn());
 				UserModel user = findOrCreateAuthenticatedUser(realm, username, windowsIdentity.getGroups(),
