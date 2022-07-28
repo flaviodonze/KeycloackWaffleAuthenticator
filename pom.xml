@@ -9,7 +9,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<keycloack.version>18.0.1</keycloack.version>
+		<keycloak.version>18.0.1</keycloak.version>
 		<jboss.logging.version>3.5.0.Final</jboss.logging.version>
 		<outputDirectory>D:\dev\env\scodidev\server\keycloak\providers</outputDirectory>
 	</properties>
@@ -41,20 +41,20 @@
 		<dependency>
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-core</artifactId>
-			<version>${keycloack.version}</version>
+			<version>${keycloak.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-server-spi</artifactId>
 			<scope>provided</scope>
-			<version>${keycloack.version}</version>
+			<version>${keycloak.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-server-spi-private</artifactId>
 			<scope>provided</scope>
-			<version>${keycloack.version}</version>
+			<version>${keycloak.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.logging</groupId>
@@ -66,7 +66,7 @@
 			<groupId>org.keycloak</groupId>
 			<artifactId>keycloak-services</artifactId>
 			<scope>provided</scope>
-			<version>${keycloack.version}</version>
+			<version>${keycloak.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>log4j</groupId>
