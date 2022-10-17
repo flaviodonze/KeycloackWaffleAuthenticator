@@ -12,8 +12,11 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserManager;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.UserProvider;
+import org.keycloak.storage.DatastoreProvider;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.UserStorageProviderModel;
+import org.keycloak.storage.datastore.LegacyDatastoreProvider;
 import org.keycloak.storage.user.ImportedUserValidation;
 import org.keycloak.waffle.NTLMCredentialInput;
 
@@ -29,6 +32,10 @@ public class NTLMFederationProvider implements UserStorageProvider, CredentialAu
 			NTLMFederationProviderFactory ntlmFederationProviderFactory) {
 		this.session = session;
 		this.userStorageProviderModel = userStorageProviderModel;
+	}
+
+	private UserProvider getUserProvider() {
+		return ((LegacyDatastoreProvider) session.getProvider(DatastoreProvider.class)).userLocalStorage();
 	}
 
 	@Override
@@ -64,7 +71,7 @@ public class NTLMFederationProvider implements UserStorageProvider, CredentialAu
 	}
 
 	private UserModel findOrCreateAuthenticatedUser(RealmModel realm, String username, IWindowsAccount[] groups, String sidString) {
-		UserModel user = session.userLocalStorage().getUserByUsername(realm, username);
+		UserModel user = getUserProvider().getUserByUsername(realm, username);
 		if (user != null) {
 			user = session.users().getUserById(realm, user.getId()); // make sure we get a cached instance
 			logger.debug("NTLM authenticated user " + username + " found in Keycloak storage");
@@ -85,7 +92,7 @@ public class NTLMFederationProvider implements UserStorageProvider, CredentialAu
 					"User with username " + username + " already exists and is linked to provider [" + userStorageProviderModel.getName()
 							+ "] but NTLM principal is not correct. NTLM principal on user is: " + user.getId());
 			logger.warn("Will re-create user");
-			new UserManager(session).removeUser(realm, user, session.userLocalStorage());
+			new UserManager(session).removeUser(realm, user, getUserProvider());
 		}
 
 		logger.debug("Kerberos authenticated user " + username + " not in Keycloak storage. Creating him");
@@ -96,7 +103,7 @@ public class NTLMFederationProvider implements UserStorageProvider, CredentialAu
 		// Just guessing email from kerberos realm
 
 		logger.debugf("Creating NTLM user: %s, to local Keycloak storage", username);
-		UserModel user = session.userLocalStorage().addUser(realm, username);
+		UserModel user = getUserProvider().addUser(realm, username);
 		user.setEnabled(true);
 		user.setFederationLink(userStorageProviderModel.getId());
 		user.setSingleAttribute("SID", sidString);
