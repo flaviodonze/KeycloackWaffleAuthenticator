@@ -13,10 +13,9 @@ import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
-import org.keycloak.storage.DatastoreProvider;
+import org.keycloak.storage.UserStoragePrivateUtil;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.UserStorageProviderModel;
-import org.keycloak.storage.datastore.LegacyDatastoreProvider;
 import org.keycloak.storage.user.ImportedUserValidation;
 import org.keycloak.waffle.NTLMCredentialInput;
 
@@ -35,7 +34,7 @@ public class NTLMFederationProvider implements UserStorageProvider, CredentialAu
 	}
 
 	private UserProvider getUserProvider() {
-		return ((LegacyDatastoreProvider) session.getProvider(DatastoreProvider.class)).userLocalStorage();
+		return UserStoragePrivateUtil.userLocalStorage(session);
 	}
 
 	@Override
